@@ -1,4 +1,11 @@
 .idea/
+videos/
+docker-compose.override.yml
+.docker/
+
+videos/
+logs/
+
 
 ### PythonVanilla template
 # Byte-compiled / optimized / DLL files

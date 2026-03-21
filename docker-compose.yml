@@ -1,0 +1,33 @@
+services:
+  tiktok-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tiktok_downloader_bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # Сохраняем видео на хост-машине
+      - ./videos:/home/appuser/app/videos
+      # Логи (опционально)
+      - ./logs:/home/appuser/app/logs
+    networks:
+      - bot_network
+    # ⚠️ Временный фикс для SSL-проблем с PyPI (может потребовать обновления IP)
+    extra_hosts:
+      - "pypi.org:146.75.46.223"
+      - "files.pythonhosted.org:146.75.46.223"
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    healthcheck:
+      test: ["CMD", "python", "-c", "print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  bot_network:
+    driver: bridge
