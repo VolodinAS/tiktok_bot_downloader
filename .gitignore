@@ -2,7 +2,7 @@
 videos/
 docker-compose.override.yml
 .docker/
-
+helpers/
 videos/
 logs/
 
