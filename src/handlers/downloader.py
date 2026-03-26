@@ -4,17 +4,17 @@ import logging
 from aiogram import Router
 from aiogram.types import FSInputFile, Message
 
-from src.filters import TikTokLinkFilter
-from src.services.tiktok_downloader import tiktok_service
+from src.filters import VideoLinkFilter
+from src.services.video_downloader import video_service
 
 
 logger = logging.getLogger(__name__)
 router = Router()
 
 
-@router.message(TikTokLinkFilter())
-async def handle_tiktok_link(message: Message) -> None:
-    """Обрабатывает ссылку на TikTok"""
+@router.message(VideoLinkFilter())
+async def handle_video_link(message: Message) -> None:
+    """Обрабатывает ссылку на TikTok или YouTube Shorts"""
     if not message.text:
         return
     
@@ -25,13 +25,13 @@ async def handle_tiktok_link(message: Message) -> None:
     
     # 🔽 2. Скачиваем в отдельном потоке (не блокируем event loop)
     video_path, error_msg = await asyncio.to_thread(
-        tiktok_service.download_video,
+        video_service.download_video,
         url
     )
     
     # ❌ 3. Если ошибка — обновляем статус-сообщение
     if video_path is None:
-        await status_message.edit_text(f"❌ {error_msg}" if error_msg else "❌ Ошибка скачивания")
+        await status_message.edit_text(f"{error_msg}" if error_msg else "❌ Ошибка скачивания")
         return
     
     # ✅ 4. Отправляем видео (чистое, без капшена)
@@ -57,4 +57,6 @@ async def handle_tiktok_link(message: Message) -> None:
 @router.message()
 async def handle_unknown_command(message: Message) -> None:
     """Реагируем на любой другой контент"""
-    await message.answer("⚠️ Неизвестная команда. Пожалуйста, отправьте ссылку на TikTok.")
+    await message.answer(
+        "⚠️ Неизвестная команда. Пожалуйста, отправьте ссылку на TikTok или YouTube Shorts."
+    )
